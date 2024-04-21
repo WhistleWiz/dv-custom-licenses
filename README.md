@@ -1,6 +1,6 @@
 <!-- PROJECT TITLE -->
 <div align="center">
-	<h1>DV Custom License</h1>
+	<h1>DV Custom Licenses</h1>
 	<p>
 		A mod to load custom licenses in the game <a href="http://www.derailvalley.com/">Derail Valley</a>.
 	</p>
