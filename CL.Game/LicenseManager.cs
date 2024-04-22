@@ -116,12 +116,15 @@ namespace CL.Game
             CreateGeneralLicensePrefabs(l, v2);
             AddTranslations(l);
             AddedGeneralLicenses.Add((l, v2));
+            Globals.G.Types.generalLicenses.Add(v2);
 
             return true;
         }
 
         private static void CreateGeneralLicensePrefabs(CustomLicense l, CustomGeneralLicenseV2 v2)
         {
+            // Once again thanks to Passenger Jobs for figuring this out.
+
             v2.RenderPrefabName = $"License{l.Identifier}Render";
             v2.SampleRenderPrefabName = $"License{l.Identifier}RenderInfo";
 
@@ -169,6 +172,7 @@ namespace CL.Game
             CreateJobLicensePrefabs(l, v2);
             AddTranslations(l);
             AddedJobLicenses.Add((l, v2));
+            Globals.G.Types.jobLicenses.Add(v2);
 
             return true;
         }

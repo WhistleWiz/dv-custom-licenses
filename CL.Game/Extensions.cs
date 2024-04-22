@@ -18,7 +18,7 @@ namespace CL.Game
             newLicense.localizationKey = license.LocalizationKey;
             newLicense.localizationKeysDescription = license.LocalizationKeysDescription;
 
-            newLicense.color = license.Color;
+            newLicense.color = license.Color.ToUnity();
             newLicense.price = license.Price;
             newLicense.insuranceFeeQuotaIncrease = license.InsuranceFeeQuotaIncrease;
             newLicense.bonusTimeDecreasePercentage = license.BonusTimeDecreasePercentage;
@@ -60,7 +60,7 @@ namespace CL.Game
             newLicense.localizationKey = license.LocalizationKey;
             newLicense.localizationKeysDescription = license.LocalizationKeysDescription;
 
-            newLicense.color = license.Color;
+            newLicense.color = license.Color.ToUnity();
             newLicense.price = license.Price;
             newLicense.insuranceFeeQuotaIncrease = license.InsuranceFeeQuotaIncrease;
             newLicense.bonusTimeDecreasePercentage = license.BonusTimeDecreasePercentage;

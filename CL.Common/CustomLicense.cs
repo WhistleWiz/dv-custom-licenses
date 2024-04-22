@@ -1,4 +1,5 @@
 ﻿using DVLangHelper.Data;
+using Newtonsoft.Json;
 using System;
 using UnityEngine;
 
@@ -13,7 +14,7 @@ namespace CL.Common
         [Tooltip("The name (id) of the license")]
         public string Identifier = "CL_LicenseId";
 
-        public Color Color = new Color(0, 0, 1, 1);
+        public Colour Color = new Colour(0, 0, 1, 1);
         public float Price = 10000;
         [Tooltip("How much copay should increase after buying this license")]
         public float InsuranceFeeQuotaIncrease;
@@ -35,5 +36,26 @@ namespace CL.Common
 
         public string LocalizationKey => $"{Constants.LocalizeRoot}/{Identifier.Replace(" ", "_").ToLowerInvariant()}";
         public string[] LocalizationKeysDescription => new[] { $"{LocalizationKey}_desc" };
+
+        // Wrapper class to avoid serialization issues.
+        public class Colour
+        {
+            public float R, G, B, A;
+
+            public Colour() : this(0, 0, 0, 0) { }
+
+            public Colour(float r, float g, float b, float a)
+            {
+                R = r;
+                G = g;
+                B = b;
+                A = a;
+            }
+
+            public Color ToUnity()
+            {
+                return new Color(R, G, B, A);
+            }
+        }
     }
 }
