@@ -11,10 +11,10 @@ namespace CL.Common
         [Tooltip("Wether this is a general license (locomotives, concurrent jobs, etc) or a job license (hazmat, train length, etc)")]
         public LicenseType LicenseType = LicenseType.General;
         [Tooltip("The name (id) of the license")]
-        public string Identifier = "";
+        public string Identifier = "CL_LicenseId";
 
-        public Color Color;
-        public float Price;
+        public Color Color = new Color(0, 0, 1, 1);
+        public float Price = 10000;
         [Tooltip("How much copay should increase after buying this license")]
         public float InsuranceFeeQuotaIncrease;
         [Tooltip("How much bonus time should decrease after buying this license")]

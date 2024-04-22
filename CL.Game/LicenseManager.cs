@@ -1,6 +1,9 @@
 ﻿using CL.Common;
 using DV;
+using DV.Booklets.Rendered;
+using DV.RenderTextureSystem.BookletRender;
 using DV.ThingTypes;
+using DV.ThingTypes.TransitionHelpers;
 using DVLangHelper.Data;
 using Newtonsoft.Json;
 using System;
@@ -20,6 +23,12 @@ namespace CL.Game
         public static Dictionary<string, int> JobMapping = new Dictionary<string, int>();
         public static List<(CustomLicense Custom, GeneralLicenseType_v2 V2)> AddedGeneralLicenses = new List<(CustomLicense, GeneralLicenseType_v2)>();
         public static List<(CustomLicense Custom, JobLicenseType_v2 V2)> AddedJobLicenses = new List<(CustomLicense, JobLicenseType_v2)>();
+
+        private static GeneralLicenseType_v2? s_de2;
+        private static JobLicenseType_v2? s_hazmat1;
+
+        public static GeneralLicenseType_v2 LicenseDE2 => s_de2 != null ? s_de2 : s_de2 = GeneralLicenseType.DE2.ToV2();
+        public static JobLicenseType_v2 LicenseHazmat1 => s_hazmat1 != null ? s_hazmat1 : s_hazmat1 = JobLicenses.Hazmat1.ToV2();
 
         public static void LoadLicenses(UnityModManager.ModEntry mod)
         {
@@ -89,7 +98,7 @@ namespace CL.Game
             }
         }
 
-        private static bool TryLoadGeneralLicense(string jsonPath, CustomLicense l, out GeneralLicenseType_v2 v2)
+        private static bool TryLoadGeneralLicense(string jsonPath, CustomLicense l, out CustomGeneralLicenseV2 v2)
         {
             var directory = Path.GetDirectoryName(jsonPath);
 
@@ -104,12 +113,46 @@ namespace CL.Game
             v2 = l.ToGeneralV2();
             v2.icon = TryLoadIcon(directory);
 
+            CreateGeneralLicensePrefabs(l, v2);
             AddTranslations(l);
+            AddedGeneralLicenses.Add((l, v2));
 
             return true;
         }
 
-        private static bool TryLoadJobLicense(string jsonPath, CustomLicense l, out JobLicenseType_v2 v2)
+        private static void CreateGeneralLicensePrefabs(CustomLicense l, CustomGeneralLicenseV2 v2)
+        {
+            v2.RenderPrefabName = $"License{l.Identifier}Render";
+            v2.SampleRenderPrefabName = $"License{l.Identifier}RenderInfo";
+
+            // Book.
+            v2.licensePrefab = Utilities.CreateMockPrefab(LicenseDE2.licensePrefab);
+            v2.licensePrefab.name = $"License{l.Identifier}";
+
+            var render = v2.licensePrefab.GetComponent<RuntimeRenderedStaticTextureBooklet>();
+            var de2RenderName = render.renderPrefabName;
+            render.renderPrefabName = v2.RenderPrefabName;
+
+            // Render prefab.
+            v2.RenderPrefab = Utilities.CreateMockPrefab(Resources.Load<GameObject>(de2RenderName));
+            v2.RenderPrefab.name = v2.RenderPrefabName;
+            v2.RenderPrefab.GetComponent<StaticLicenseBookletRender>().generalLicense = v2;
+
+            // Sample book.
+            v2.licenseInfoPrefab = Utilities.CreateMockPrefab(LicenseDE2.licenseInfoPrefab);
+            v2.licenseInfoPrefab.name = $"License{l.Identifier}Info";
+
+            var infoRender = v2.licenseInfoPrefab.GetComponent<RuntimeRenderedStaticTextureBooklet>();
+            var de2InfoRenderName = infoRender.renderPrefabName;
+            infoRender.renderPrefabName = v2.SampleRenderPrefabName;
+
+            // Sample render prefab.
+            v2.SampleRenderPrefab = Utilities.CreateMockPrefab(Resources.Load<GameObject>(de2InfoRenderName));
+            v2.SampleRenderPrefab.name = v2.SampleRenderPrefabName;
+            v2.SampleRenderPrefab.GetComponent<StaticLicenseBookletRender>().generalLicense = v2;
+        }
+
+        private static bool TryLoadJobLicense(string jsonPath, CustomLicense l, out CustomJobLicenseV2 v2)
         {
             var directory = Path.GetDirectoryName(jsonPath);
 
@@ -123,9 +166,43 @@ namespace CL.Game
             v2 = l.ToJobV2();
             v2.icon = TryLoadIcon(directory);
 
+            CreateJobLicensePrefabs(l, v2);
             AddTranslations(l);
+            AddedJobLicenses.Add((l, v2));
 
             return true;
+        }
+
+        private static void CreateJobLicensePrefabs(CustomLicense l, CustomJobLicenseV2 v2)
+        {
+            v2.RenderPrefabName = $"License{l.Identifier}Render";
+            v2.SampleRenderPrefabName = $"License{l.Identifier}RenderInfo";
+
+            // Book.
+            v2.licensePrefab = Utilities.CreateMockPrefab(LicenseHazmat1.licensePrefab);
+            v2.licensePrefab.name = $"License{l.Identifier}";
+
+            var render = v2.licensePrefab.GetComponent<RuntimeRenderedStaticTextureBooklet>();
+            var hazmatRenderName = render.renderPrefabName;
+            render.renderPrefabName = v2.RenderPrefabName;
+
+            // Render prefab.
+            v2.RenderPrefab = Utilities.CreateMockPrefab(Resources.Load<GameObject>(hazmatRenderName));
+            v2.RenderPrefab.name = v2.RenderPrefabName;
+            v2.RenderPrefab.GetComponent<StaticLicenseBookletRender>().jobLicense = v2;
+
+            // Sample book.
+            v2.licenseInfoPrefab = Utilities.CreateMockPrefab(LicenseHazmat1.licenseInfoPrefab);
+            v2.licenseInfoPrefab.name = $"License{l.Identifier}Info";
+
+            var infoRender = v2.licenseInfoPrefab.GetComponent<RuntimeRenderedStaticTextureBooklet>();
+            var hazmatInfoRenderName = infoRender.renderPrefabName;
+            infoRender.renderPrefabName = v2.SampleRenderPrefabName;
+
+            // Sample render prefab.
+            v2.SampleRenderPrefab = Utilities.CreateMockPrefab(Resources.Load<GameObject>(hazmatInfoRenderName));
+            v2.SampleRenderPrefab.name = v2.SampleRenderPrefabName;
+            v2.SampleRenderPrefab.GetComponent<StaticLicenseBookletRender>().jobLicense = v2;
         }
 
         private static void AddTranslations(CustomLicense license)
