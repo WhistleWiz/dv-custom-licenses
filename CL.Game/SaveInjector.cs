@@ -1,17 +1,14 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using CL.Common;
+using DV.InventorySystem;
+using DV.JObjectExtstensions;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using CL.Common;
 using System.Linq;
 
 namespace CL.Game
 {
     internal class SaveInjector
     {
-        private const string s_gKeys = "GeneralKeys";
-        private const string s_gValues = "GeneralValues";
-        private const string s_jKeys = "JobKeys";
-        private const string s_jValues = "JobValues";
-
         internal static JObject? LoadedData;
 
         internal static void ExtractDataFromSaveGame(SaveGameData data)
@@ -20,72 +17,132 @@ namespace CL.Game
 
             if (LoadedData != null)
             {
-                ProcessGeneralMapping();
-                ProcessJobMapping();
+                var mappingData = LoadedData.GetObjectViaJSON<LicenseMappingDataHolder>(Constants.SaveKeyMapping);
+
+                if (mappingData != null)
+                {
+                    ProcessGeneralMapping(mappingData);
+                    ProcessJobMapping(mappingData);
+                    return;
+                }
             }
-            else
-            {
-                CLMod.Warning("No data found in save file, using new cache.");
-            }
+
+            CLMod.Warning("No data found in save file, using new cache.");
         }
 
-        private static void ProcessGeneralMapping()
+        private static void ProcessGeneralMapping(LicenseMappingDataHolder data)
         {
-            var keys = LoadedData![s_gKeys]!.ToObject<string[]>();
-            var values = LoadedData[s_gValues]!.ToObject<int[]>();
+            var keys = data.GeneralKeys;
+            var values = data.GeneralValues;
+            var dictionary = new Dictionary<string, int>();
 
-            if (keys != null && values != null)
+            for (int i = 0; i < keys.Length; i++)
             {
-                var dictionary = new Dictionary<string, int>();
-
-                for (int i = 0; i < keys.Length; i++)
-                {
-                    dictionary.Add(keys[i], values[i]);
-                }
-
-                LicenseManager.GeneralMapping = dictionary;
-                CLMod.Log("General mapping cache sucessfully loaded.");
+                dictionary.Add(keys[i], values[i]);
             }
-            else
-            {
-                CLMod.Error("Error loading data: general mapping is null!");
-            }
+
+            LicenseManager.GeneralMapping = dictionary;
+            CLMod.Log("General mapping cache sucessfully loaded.");
         }
 
-        private static void ProcessJobMapping()
+        private static void ProcessJobMapping(LicenseMappingDataHolder data)
         {
-            var keys = LoadedData![s_jKeys]!.ToObject<string[]>();
-            var values = LoadedData[s_jValues]!.ToObject<int[]>();
+            var keys = data.JobKeys;
+            var values = data.JobValues;
 
-            if (keys != null && values != null)
+            var dictionary = new Dictionary<string, int>();
+
+            for (int i = 0; i < keys.Length; i++)
             {
-                var dictionary = new Dictionary<string, int>();
-
-                for (int i = 0; i < keys.Length; i++)
-                {
-                    dictionary.Add(keys[i], values[i]);
-                }
-
-                LicenseManager.JobMapping = dictionary;
-                CLMod.Log("Job mapping cache sucessfully loaded.");
+                dictionary.Add(keys[i], values[i]);
             }
-            else
-            {
-                CLMod.Error("Error loading data: job mapping is null!");
-            }
+
+            LicenseManager.JobMapping = dictionary;
+            CLMod.Log("Job mapping cache sucessfully loaded.");
         }
 
         internal static void InjectDataIntoSaveGame(SaveGameData data)
         {
-            LoadedData = new JObject
+            LoadedData = data.GetJObject(Constants.SaveKey);
+            LoadedData ??= new JObject();
+
+            LoadedData.SetObjectViaJSON(Constants.SaveKeyMapping, new LicenseMappingDataHolder
             {
-                { s_gKeys, JToken.FromObject(LicenseManager.GeneralMapping.Keys.ToArray()) },
-                { s_gValues, JToken.FromObject(LicenseManager.GeneralMapping.Values.ToArray()) },
-                { s_jKeys, JToken.FromObject(LicenseManager.JobMapping.Keys.ToArray()) },
-                { s_jValues, JToken.FromObject(LicenseManager.JobMapping.Values.ToArray()) }
-            };
+                GeneralKeys = LicenseManager.GeneralMapping.Keys.ToArray(),
+                GeneralValues = LicenseManager.GeneralMapping.Values.ToArray(),
+                JobKeys = LicenseManager.JobMapping.Keys.ToArray(),
+                JobValues = LicenseManager.JobMapping.Values.ToArray()
+            });
+
+            foreach (var (_, V2) in LicenseManager.AddedGeneralLicenses)
+            {
+                LoadedData.SetBool($"{Constants.SaveKeyAcquiredLicense}{V2.id}", global::LicenseManager.Instance.IsGeneralLicenseAcquired(V2));
+            }
+
+            foreach (var (_, V2) in LicenseManager.AddedJobLicenses)
+            {
+                LoadedData.SetBool($"{Constants.SaveKeyAcquiredLicense}{V2.id}", global::LicenseManager.Instance.IsJobLicenseAcquired(V2));
+            }
 
             data.SetJObject(Constants.SaveKey, LoadedData);
+        }
+
+        internal static void AcquireLicenses()
+        {
+            if (LoadedData != null && Inventory.Instance)
+            {
+                CLMod.Log("Acquiring licenses...");
+                List<string> general = new List<string>();
+                List<string> job = new List<string>();
+                float totalCost = 0;
+
+                foreach (var (_, V2) in LicenseManager.AddedGeneralLicenses)
+                {
+                    var result = LoadedData.GetBool($"{Constants.SaveKeyAcquiredLicense}{V2.id}");
+
+                    if (result != null && result.Value)
+                    {
+                        global::LicenseManager.Instance.AcquireGeneralLicense(V2);
+                        general.Add(V2.id);
+                        totalCost += V2.price;
+                    }
+                }
+
+                CLMod.Log($"GL: {string.Join(", ", general)}");
+
+                foreach (var (_, V2) in LicenseManager.AddedJobLicenses)
+                {
+                    var result = LoadedData.GetBool($"{Constants.SaveKeyAcquiredLicense}{V2.id}");
+
+                    if (result != null && result.Value)
+                    {
+                        global::LicenseManager.Instance.AcquireJobLicense(V2);
+                        job.Add(V2.id);
+                        totalCost += V2.price;
+                    }
+                }
+
+                CLMod.Log($"JL: {string.Join(", ", job)}");
+
+                // Remove total license cost.
+                Inventory.Instance.RemoveMoney(totalCost);
+            }
+        }
+
+        private class LicenseMappingDataHolder
+        {
+            public string[] GeneralKeys;
+            public int[] GeneralValues;
+            public string[] JobKeys;
+            public int[] JobValues;
+
+            public LicenseMappingDataHolder()
+            {
+                GeneralKeys = new string[0];
+                GeneralValues = new int[0];
+                JobKeys = new string[0];
+                JobValues = new int[0];
+            }
         }
     }
 }
