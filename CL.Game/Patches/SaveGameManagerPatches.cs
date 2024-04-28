@@ -5,7 +5,7 @@ namespace CL.Game.Patches
     [HarmonyPatch(typeof(SaveGameManager))]
     internal class SaveGameManagerPatches
     {
-        [HarmonyPrefix, HarmonyPatch("DoSaveIO")]
+        [HarmonyPrefix, HarmonyPatch(nameof(SaveGameManager.DoSaveIO))]
         public static void InjectSaveData(SaveGameData data)
         {
             SaveInjector.InjectDataIntoSaveGame(data);

@@ -1,57 +1,35 @@
 ﻿using DV.Booklets;
 using HarmonyLib;
-using System.Collections.Generic;
-using System.Reflection.Emit;
-using System.Reflection;
 using UnityEngine;
-using System;
+using DV.Booklets.Rendered;
+using DV.RenderTextureSystem.BookletRender;
 
 namespace CL.Game.Patches
 {
-    // Once again thanks to Passenger Jobs.
     [HarmonyPatch(typeof(BookletCreator_StaticRenderBooklet))]
     internal class BookletCreator_StaticRenderBookletPatches
     {
-        private static MethodInfo s_resourcesLoadMethod = AccessTools.Method(
-            typeof(Resources), nameof(Resources.Load), new[] { typeof(string), typeof(Type) });
 
-        [HarmonyPatch(nameof(BookletCreator_StaticRenderBooklet.Render))]
-        [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> RenderTranspiler(IEnumerable<CodeInstruction> instructions)
+        [HarmonyPrefix, HarmonyPatch(nameof(BookletCreator_StaticRenderBooklet.Render))]
+        public static bool RenderPrefix(GameObject existingBooklet, string renderPrefabName, ref RenderedTexturesBooklet __result)
         {
-            bool skipping = false;
-
-            foreach (var instruction in instructions)
+            if (!LicenseManager.KeyToPrefab.TryGetValue(renderPrefabName, out var result))
             {
-                if (skipping)
-                {
-                    if (instruction.Calls(s_resourcesLoadMethod))
-                    {
-                        skipping = false;
-                    }
-                    continue;
-                }
-
-                if (instruction.opcode == OpCodes.Ldtoken)
-                {
-                    yield return CodeInstruction.Call((string s) => LoadRenderPrefab(s));
-                    skipping = true;
-                    continue;
-                }
-
-                yield return instruction;
-            }
-        }
-
-        private static UnityEngine.Object LoadRenderPrefab(string name)
-        {
-            if (!LicenseManager.KeyToPrefab.TryGetValue(name, out var result))
-            {
-                result = Resources.Load<GameObject>(name);
+                return true;
             }
 
-            result!.SetActive(true);
-            return result;
+            StaticTextureRenderBase component = Object.Instantiate(result, DV.RenderTextureSystem.RenderTextureSystem.Instance.transform.position,
+                Quaternion.identity).GetComponent<StaticTextureRenderBase>();
+
+            // Since this isn't a resource we have to reactive the object or it won't draw anything.
+            component.gameObject.SetActive(true);
+
+            RenderedTexturesBooklet component2 = existingBooklet.GetComponent<RenderedTexturesBooklet>();
+            component2.RegisterTexturesGeneratedEvent(component);
+            component.GenerateStaticPagesTextures();
+            __result = component2;
+
+            return false;
         }
     }
 }

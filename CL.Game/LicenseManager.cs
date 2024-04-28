@@ -267,7 +267,7 @@ namespace CL.Game
                 tex.LoadImage(data);
 
                 // Create a sprite that covers the whole texture.
-                return Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100);
+                return Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100, 1, SpriteMeshType.Tight);
             }
 
             return null!;
