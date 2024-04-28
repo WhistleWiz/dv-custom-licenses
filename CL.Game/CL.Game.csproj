@@ -6,11 +6,18 @@
 		<LangVersion>8</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="Krafs.Publicizer" Version="2.2.1">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\CL.Common\CL.Common.csproj" />
 	</ItemGroup>
+  <ItemGroup>
+    <Publicize Include="Assembly-CSharp" />
+  </ItemGroup>
 	<ItemGroup>
 		<Reference Include="Assembly-CSharp" />
 		<Reference Include="UnityModManager" />

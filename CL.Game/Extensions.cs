@@ -14,9 +14,10 @@ namespace CL.Game
 
             newLicense.id = license.Identifier;
             newLicense.v1 = (GeneralLicenseType)(++s_tempValue);
+            newLicense.Original = license;
 
             newLicense.localizationKey = license.LocalizationKey;
-            newLicense.localizationKeysDescription = license.LocalizationKeysDescription;
+            newLicense.localizationKeysDescription = new[] { license.LocalizationKeyDescription };
 
             newLicense.color = license.Color.ToUnity();
             newLicense.price = license.Price;
@@ -56,9 +57,10 @@ namespace CL.Game
 
             newLicense.id = license.Identifier;
             newLicense.v1 = (JobLicenses)(++s_tempValue);
+            newLicense.Original = license;
 
             newLicense.localizationKey = license.LocalizationKey;
-            newLicense.localizationKeysDescription = license.LocalizationKeysDescription;
+            newLicense.localizationKeysDescription = new[] { license.LocalizationKeyDescription };
 
             newLicense.color = license.Color.ToUnity();
             newLicense.price = license.Price;

@@ -31,11 +31,15 @@ namespace CL.Common
         public FreeRoamAvailability Availability = FreeRoamAvailability.OnlyIfUnlockedInCareer;
 
         [Header("Localization")]
-        public TranslationData? TranslationNameData;
-        public TranslationData? TranslationDescriptionData;
+        public TranslationData? TranslationName;
+        public TranslationData? TranslationDescription;
+        public TranslationData? TranslationItem;
+        public TranslationData? TranslationInfoItem;
 
         public string LocalizationKey => $"{Constants.LocalizeRoot}/{Identifier.Replace(" ", "_").ToLowerInvariant()}";
-        public string[] LocalizationKeysDescription => new[] { $"{LocalizationKey}_desc" };
+        public string LocalizationKeyDescription => $"{LocalizationKey}_desc";
+        public string LocalizationKeyItem => $"{LocalizationKey}_item";
+        public string LocalizationKeyInfoItem => $"{LocalizationKey}_sample_item";
 
         // Wrapper class to avoid serialization issues.
         public class Colour

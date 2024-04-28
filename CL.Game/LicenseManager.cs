@@ -23,6 +23,7 @@ namespace CL.Game
         public static Dictionary<string, int> JobMapping = new Dictionary<string, int>();
         public static List<(CustomLicense Custom, GeneralLicenseType_v2 V2)> AddedGeneralLicenses = new List<(CustomLicense, GeneralLicenseType_v2)>();
         public static List<(CustomLicense Custom, JobLicenseType_v2 V2)> AddedJobLicenses = new List<(CustomLicense, JobLicenseType_v2)>();
+        public static Dictionary<string, GameObject> KeyToPrefab = new Dictionary<string, GameObject>();
 
         private static GeneralLicenseType_v2? s_de2;
         private static JobLicenseType_v2? s_hazmat1;
@@ -91,11 +92,6 @@ namespace CL.Game
                 CLMod.Log($"Loaded {newJobLicenses.Count} job licenses from {mod.Path}");
                 CLMod.Log(string.Join(", ", newJobLicenses.Select(x => x.id)));
             }
-
-            if (newGeneralLicenses.Count > 0 || newJobLicenses.Count > 0)
-            {
-                Globals.G.Types.RecalculateCaches();
-            }
         }
 
         private static bool TryLoadGeneralLicense(string jsonPath, CustomLicense l, out CustomGeneralLicenseV2 v2)
@@ -153,6 +149,10 @@ namespace CL.Game
             v2.SampleRenderPrefab = Utilities.CreateMockPrefab(Resources.Load<GameObject>(de2InfoRenderName));
             v2.SampleRenderPrefab.name = v2.SampleRenderPrefabName;
             v2.SampleRenderPrefab.GetComponent<StaticLicenseBookletRender>().generalLicense = v2;
+
+            // Add to dictionary for access in patch.
+            KeyToPrefab.Add(v2.RenderPrefabName, v2.RenderPrefab);
+            KeyToPrefab.Add(v2.SampleRenderPrefabName, v2.SampleRenderPrefab);
         }
 
         private static bool TryLoadJobLicense(string jsonPath, CustomLicense l, out CustomJobLicenseV2 v2)
@@ -207,12 +207,16 @@ namespace CL.Game
             v2.SampleRenderPrefab = Utilities.CreateMockPrefab(Resources.Load<GameObject>(hazmatInfoRenderName));
             v2.SampleRenderPrefab.name = v2.SampleRenderPrefabName;
             v2.SampleRenderPrefab.GetComponent<StaticLicenseBookletRender>().jobLicense = v2;
+
+            // Add to dictionary for access in patch.
+            KeyToPrefab.Add(v2.RenderPrefabName, v2.RenderPrefab);
+            KeyToPrefab.Add(v2.SampleRenderPrefabName, v2.SampleRenderPrefab);
         }
 
         private static void AddTranslations(CustomLicense license)
         {
             // If there are no translations, use the name as default.
-            if (license.TranslationNameData == null)
+            if (license.TranslationName == null)
             {
                 CLMod.Translations.AddTranslations(
                     license.LocalizationKey,
@@ -222,14 +226,28 @@ namespace CL.Game
             {
                 CLMod.Translations.AddTranslations(
                     license.LocalizationKey,
-                    license.TranslationNameData);
+                    license.TranslationName);
             }
 
-            if (license.TranslationDescriptionData != null)
+            if (license.TranslationDescription != null)
             {
                 CLMod.Translations.AddTranslations(
-                    license.LocalizationKeysDescription[0],
-                    license.TranslationDescriptionData);
+                    license.LocalizationKeyDescription,
+                    license.TranslationDescription);
+            }
+
+            if (license.TranslationItem != null)
+            {
+                CLMod.Translations.AddTranslations(
+                    license.LocalizationKeyItem,
+                    license.TranslationItem);
+            }
+
+            if (license.TranslationInfoItem != null)
+            {
+                CLMod.Translations.AddTranslations(
+                    license.LocalizationKeyInfoItem,
+                    license.TranslationInfoItem);
             }
         }
 
