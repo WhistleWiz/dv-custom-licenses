@@ -19,5 +19,7 @@
         // Misc.
         public const int DefaultLicenseValue = 10000;
         public const string SaveKey = "dv_custom_license";
+        public const string SaveKeyMapping = "mapping_data";
+        public const string SaveKeyAcquiredLicense = "license_acquired_";
     }
 }
