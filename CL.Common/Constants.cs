@@ -11,7 +11,6 @@
         public const string LangHelper = "DVLangHelper";
         public const string MainModId = "DVCustomLicenses";
         public const string ModIdPrefix = "CL_";
-        public const string CCL = "DVCustomCarLoader";
 
         // Localization.
         public const string LocalizeRoot = "customlicenses";

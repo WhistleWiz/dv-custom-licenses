@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CL.Common", "CL.Common\CL.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CL.Game", "CL.Game\CL.Game.csproj", "{2FEE4E2B-F031-483E-AC16-7A8F3527E3B1}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CL.Unity", "CL.Unity\CL.Unity.csproj", "{77595CE5-DE0C-4EE5-BBE4-2F6B716CF9D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,8 +23,15 @@ Global
 		{2FEE4E2B-F031-483E-AC16-7A8F3527E3B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FEE4E2B-F031-483E-AC16-7A8F3527E3B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2FEE4E2B-F031-483E-AC16-7A8F3527E3B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77595CE5-DE0C-4EE5-BBE4-2F6B716CF9D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77595CE5-DE0C-4EE5-BBE4-2F6B716CF9D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77595CE5-DE0C-4EE5-BBE4-2F6B716CF9D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77595CE5-DE0C-4EE5-BBE4-2F6B716CF9D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AC27D2F1-A8E1-4B99-84DE-2EC15E5C05CF}
 	EndGlobalSection
 EndGlobal

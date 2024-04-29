@@ -80,17 +80,26 @@ namespace CL.Game
                 }
             }
 
+            bool flag = false;
+
             // If we did load any licenses...
             if (newGeneralLicenses.Count > 0)
             {
                 CLMod.Log($"Loaded {newGeneralLicenses.Count} general licenses from {mod.Path}");
                 CLMod.Log(string.Join(", ", newGeneralLicenses.Select(x => x.id)));
+                flag = true;
             }
 
             if (newJobLicenses.Count > 0)
             {
                 CLMod.Log($"Loaded {newJobLicenses.Count} job licenses from {mod.Path}");
                 CLMod.Log(string.Join(", ", newJobLicenses.Select(x => x.id)));
+                flag = true;
+            }
+
+            if (flag)
+            {
+                Globals.G.Types.RecalculateCaches();
             }
         }
 

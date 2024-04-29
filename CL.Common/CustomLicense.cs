@@ -1,5 +1,4 @@
 ﻿using DVLangHelper.Data;
-using Newtonsoft.Json;
 using System;
 using UnityEngine;
 
@@ -9,16 +8,18 @@ namespace CL.Common
     public class CustomLicense
     {
         [Header("License properties")]
-        [Tooltip("Wether this is a general license (locomotives, concurrent jobs, etc) or a job license (hazmat, train length, etc)")]
+        [Tooltip("Whether this is a general license (locomotives, concurrent jobs, etc) or a job license (hazmat, train length, etc)")]
         public LicenseType LicenseType = LicenseType.General;
         [Tooltip("The name (id) of the license")]
         public string Identifier = "CL_LicenseId";
 
-        public Colour Color = new Colour(0, 0, 1, 1);
+        public Colour Color = Colour.FromUnity(new Color32(43, 166, 166, byte.MaxValue));
         public float Price = 10000;
         [Tooltip("How much copay should increase after buying this license")]
         public float InsuranceFeeQuotaIncrease;
-        [Tooltip("How much bonus time should decrease after buying this license")]
+        [Tooltip("How much bonus time should decrease after buying this license\n" +
+            "1% is written as 0.01\n" +
+            "Negative values will give more bonus time instead")]
         public float BonusTimeDecreasePercentage;
 
         [Header("Requirements (Optional)")]
@@ -31,9 +32,13 @@ namespace CL.Common
         public FreeRoamAvailability Availability = FreeRoamAvailability.OnlyIfUnlockedInCareer;
 
         [Header("Localization")]
+        [Tooltip("The name of the license (DE2, S282, Hazmat 2)")]
         public TranslationData? TranslationName;
+        [Tooltip("The description of the license")]
         public TranslationData? TranslationDescription;
+        [Tooltip("The name of the inventory item for the license")]
         public TranslationData? TranslationItem;
+        [Tooltip("The name of the inventory item for the sample version of the license")]
         public TranslationData? TranslationInfoItem;
 
         public string LocalizationKey => $"{Constants.LocalizeRoot}/{Identifier.Replace(" ", "_").ToLowerInvariant()}";
@@ -42,6 +47,7 @@ namespace CL.Common
         public string LocalizationKeyInfoItem => $"{LocalizationKey}_sample_item";
 
         // Wrapper class to avoid serialization issues.
+        [Serializable]
         public class Colour
         {
             public float R, G, B, A;
@@ -59,6 +65,16 @@ namespace CL.Common
             public Color ToUnity()
             {
                 return new Color(R, G, B, A);
+            }
+
+            public static Color ToUnity(Colour c)
+            {
+                return c.ToUnity();
+            }
+
+            public static Colour FromUnity(Color color)
+            {
+                return new Colour(color.r, color.g, color.b, color.a);
             }
         }
     }
