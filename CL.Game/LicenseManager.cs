@@ -27,6 +27,7 @@ namespace CL.Game
 
         private static GeneralLicenseType_v2? s_de2;
         private static JobLicenseType_v2? s_hazmat1;
+        private static List<int> s_availableJobIds = GetAvailableJobLicenseIds();
 
         public static GeneralLicenseType_v2 LicenseDE2 => s_de2 != null ? s_de2 : s_de2 = GeneralLicenseType.DE2.ToV2();
         public static JobLicenseType_v2 LicenseHazmat1 => s_hazmat1 != null ? s_hazmat1 : s_hazmat1 = JobLicenses.Hazmat1.ToV2();
@@ -36,7 +37,7 @@ namespace CL.Game
             List<GeneralLicenseType_v2> newGeneralLicenses = new List<GeneralLicenseType_v2>();
             List<JobLicenseType_v2> newJobLicenses = new List<JobLicenseType_v2>();
 
-            // Find the 'cargo.json' files.
+            // Find the 'license.json' files.
             foreach (string jsonPath in Directory.EnumerateFiles(mod.Path, Constants.LicenseFile, SearchOption.AllDirectories))
             {
                 CustomLicense? l;
@@ -171,6 +172,13 @@ namespace CL.Game
             if (Globals.G.Types.jobLicenses.Any(x => x.id == l.Identifier))
             {
                 CLMod.Error($"License with name '{l.Identifier}' already exists!");
+                v2 = null!;
+                return false;
+            }
+
+            if (s_availableJobIds.Count <= 0)
+            {
+                CLMod.Error($"Cannot load job license '{l.Identifier}', maximum loaded job licenses reached!");
                 v2 = null!;
                 return false;
             }
@@ -319,22 +327,24 @@ namespace CL.Game
         {
             CLMod.Log("Applying job mappings...");
 
-            int highest = Constants.DefaultLicenseValue;
-
-            // Get the highest ID, to start counting from there.
-            foreach (var item in JobMapping)
-            {
-                highest = Mathf.Max(highest, (int)item.Value);
-            }
+            s_availableJobIds = GetAvailableJobLicenseIds();
+            s_availableJobIds.RemoveAll(x => JobMapping.ContainsValue(x));
 
             AddedJobValues = new HashSet<JobLicenses>();
             int newTypes = 0;
 
             foreach (var (_, v2) in AddedJobLicenses)
             {
+                if (s_availableJobIds.Count <= 0)
+                {
+                    CLMod.Error("Reached maximum number of job licenses in save file, aborting mapping of new ones.");
+                    break;
+                }
+
                 if (!JobMapping.TryGetValue(v2.id, out int type))
                 {
-                    type = ++highest;
+                    type = s_availableJobIds[0];
+                    s_availableJobIds.RemoveAt(0);
                     JobMapping.Add(v2.id, type);
                     newTypes++;
                 }
@@ -345,7 +355,47 @@ namespace CL.Game
 
             // Recalculate caches with the new values.
             Globals.G.Types.RecalculateCaches();
-            CLMod.Log($"Mappings applied: {AddedJobValues.Count}/{JobMapping.Count} (new: {newTypes}), highest value is {highest}");
+            CLMod.Log($"Mappings applied: {AddedJobValues.Count}/{JobMapping.Count} (new: {newTypes})");
         }
+
+        // Mod limits job licenses to 21 due to the way they work in DV.
+        public static List<int> GetAvailableJobLicenseIds() => new List<int>
+        {
+            // Basic: 0
+            // Hazmat 1: 1
+            // Hazmat 2: 2
+            // Hazmat 3: 4
+            // Military 1: 8
+            // Military 2: 16
+            // Military 3: 32
+            // Passenger Jobs (mod compatibility): 64
+            128,
+            256,
+            // Freight Haul: 512
+            // Shunting: 1024
+            // Logistical Haul: 2048
+            4096,
+            8192,
+            // Train Length 1: 16384
+            // Train Length 2: 32768
+            65536,
+            // Lazyness ensues:
+            1 << 17,
+            1 << 18,
+            1 << 19,
+            1 << 20,
+            1 << 21,
+            1 << 22,
+            1 << 23,
+            1 << 24,
+            1 << 25,
+            1 << 26,
+            1 << 27,
+            1 << 28,
+            1 << 29,
+            1 << 30,
+            1 << 31,
+            1 << 32
+        };
     }
 }

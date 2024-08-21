@@ -138,7 +138,9 @@ namespace CL.Unity.Inspector
 
                 if (!string.IsNullOrEmpty(description.Value))
                 {
-                    Debug.Log("Please fill out the fields marked [LIKE THIS] in the description of the license!");
+                    EditorUtility.DisplayDialog("Attention",
+                        "Please fill out the fields marked [LIKE THIS] in the description of the license!",
+                        "I will thanks");
                 }
             }
         }
