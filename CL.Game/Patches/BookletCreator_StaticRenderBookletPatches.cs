@@ -11,7 +11,7 @@ namespace CL.Game.Patches
     {
 
         [HarmonyPrefix, HarmonyPatch(nameof(BookletCreator_StaticRenderBooklet.Render))]
-        public static bool RenderPrefix(GameObject existingBooklet, string renderPrefabName, ref RenderedTexturesBooklet __result)
+        public static bool RenderPrefix(GameObject existingBooklet, string renderPrefabName, ref RenderedTexturesBase __result)
         {
             if (!LicenseManager.KeyToPrefab.TryGetValue(renderPrefabName, out var result))
             {

@@ -4,16 +4,27 @@ namespace CL.Game
 {
     internal class Utilities
     {
-        public static GameObject CreateMockPrefab(GameObject source)
+        private static Transform? s_holder;
+        private static Transform Holder
         {
-            bool sourceActive = source.activeSelf;
-            source.SetActive(false);
+            get
+            {
+                if (s_holder == null)
+                {
+                    s_holder = new GameObject("[CL HOLDER]").transform;
+                    s_holder.gameObject.SetActive(false);
 
-            var result = Object.Instantiate(source);
-            Object.DontDestroyOnLoad(result);
+                    Object.DontDestroyOnLoad(s_holder.gameObject);
+                }
 
-            source.SetActive(sourceActive);
+                return s_holder;
+            }
+        }
 
+        public static T CreateMockPrefab<T>(T source)
+             where T : Object
+        {
+            var result = Object.Instantiate(source, Holder);
             return result;
         }
     }

@@ -17,13 +17,13 @@ namespace CL.Game
 {
     internal class LicenseManager
     {
-        public static HashSet<GeneralLicenseType> AddedGeneralValues = new HashSet<GeneralLicenseType>();
-        public static HashSet<JobLicenses> AddedJobValues = new HashSet<JobLicenses>();
-        public static Dictionary<string, int> GeneralMapping = new Dictionary<string, int>();
-        public static Dictionary<string, int> JobMapping = new Dictionary<string, int>();
-        public static List<(CustomLicense Custom, GeneralLicenseType_v2 V2)> AddedGeneralLicenses = new List<(CustomLicense, GeneralLicenseType_v2)>();
-        public static List<(CustomLicense Custom, JobLicenseType_v2 V2)> AddedJobLicenses = new List<(CustomLicense, JobLicenseType_v2)>();
-        public static Dictionary<string, GameObject> KeyToPrefab = new Dictionary<string, GameObject>();
+        public static HashSet<GeneralLicenseType> AddedGeneralValues = new();
+        public static HashSet<JobLicenses> AddedJobValues = new();
+        public static Dictionary<string, int> GeneralMapping = new();
+        public static Dictionary<string, int> JobMapping = new();
+        public static List<(CustomLicense Custom, GeneralLicenseType_v2 V2)> AddedGeneralLicenses = new();
+        public static List<(CustomLicense Custom, JobLicenseType_v2 V2)> AddedJobLicenses = new();
+        public static Dictionary<string, GameObject> KeyToPrefab = new();
 
         private static GeneralLicenseType_v2? s_de2;
         private static JobLicenseType_v2? s_hazmat1;
@@ -34,8 +34,8 @@ namespace CL.Game
 
         public static void LoadLicenses(UnityModManager.ModEntry mod)
         {
-            List<GeneralLicenseType_v2> newGeneralLicenses = new List<GeneralLicenseType_v2>();
-            List<JobLicenseType_v2> newJobLicenses = new List<JobLicenseType_v2>();
+            List<CustomGeneralLicenseV2> newGeneralLicenses = new();
+            List<CustomJobLicenseV2> newJobLicenses = new();
 
             // Find the 'license.json' files.
             foreach (string jsonPath in Directory.EnumerateFiles(mod.Path, Constants.LicenseFile, SearchOption.AllDirectories))
@@ -101,6 +101,16 @@ namespace CL.Game
             if (flag)
             {
                 Globals.G.Types.RecalculateCaches();
+
+                foreach (var license in newGeneralLicenses)
+                {
+                    license.CalculateRequirements();
+                }
+
+                foreach (var license in newJobLicenses)
+                {
+                    license.CalculateRequirements();
+                }
             }
         }
 
@@ -282,9 +292,11 @@ namespace CL.Game
                 data = File.ReadAllBytes(path);
                 var tex = new Texture2D(2, 2);
                 tex.LoadImage(data);
+                tex.wrapMode = TextureWrapMode.Clamp;
+                tex.filterMode = FilterMode.Bilinear;
 
                 // Create a sprite that covers the whole texture.
-                return Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+                return Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100.0f, 1, SpriteMeshType.Tight);
             }
 
             return null!;
@@ -379,9 +391,9 @@ namespace CL.Game
             // Train Length 1: 16384
             // Train Length 2: 32768
             65536,
+            131072,
+            // Fragile: 262144
             // Lazyness ensues:
-            1 << 17,
-            1 << 18,
             1 << 19,
             1 << 20,
             1 << 21,
