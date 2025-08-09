@@ -1,15 +1,15 @@
-﻿using DV.Booklets;
+﻿using DV.Booklets.Rendered;
+using DV.Booklets;
+using DV.RenderTextureSystem.BookletRender;
+using DV.RenderTextureSystem;
 using HarmonyLib;
 using UnityEngine;
-using DV.Booklets.Rendered;
-using DV.RenderTextureSystem.BookletRender;
 
 namespace CL.Game.Patches
 {
     [HarmonyPatch(typeof(BookletCreator_StaticRenderBooklet))]
     internal class BookletCreator_StaticRenderBookletPatches
     {
-
         [HarmonyPrefix, HarmonyPatch(nameof(BookletCreator_StaticRenderBooklet.Render))]
         public static bool RenderPrefix(GameObject existingBooklet, string renderPrefabName, ref RenderedTexturesBase __result)
         {
@@ -18,7 +18,7 @@ namespace CL.Game.Patches
                 return true;
             }
 
-            StaticTextureRenderBase component = Object.Instantiate(result, DV.RenderTextureSystem.RenderTextureSystem.Instance.transform.position,
+            StaticTextureRenderBase component = Object.Instantiate(result, RenderTextureSystem.Instance.transform.position,
                 Quaternion.identity).GetComponent<StaticTextureRenderBase>();
 
             // Since this isn't a resource we have to reactive the object or it won't draw anything.

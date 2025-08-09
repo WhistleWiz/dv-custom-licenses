@@ -171,6 +171,8 @@ namespace CL.Game
             v2.SampleRenderPrefab.GetComponent<StaticLicenseBookletRender>().generalLicense = v2;
 
             // Add to dictionary for access in patch.
+            KeyToPrefab.Add(v2.licensePrefab.name, v2.licensePrefab);
+            KeyToPrefab.Add(v2.licenseInfoPrefab.name, v2.licenseInfoPrefab);
             KeyToPrefab.Add(v2.RenderPrefabName, v2.RenderPrefab);
             KeyToPrefab.Add(v2.SampleRenderPrefabName, v2.SampleRenderPrefab);
         }
@@ -236,6 +238,7 @@ namespace CL.Game
             v2.SampleRenderPrefab.GetComponent<StaticLicenseBookletRender>().jobLicense = v2;
 
             // Add to dictionary for access in patch.
+            KeyToPrefab.Add(v2.licensePrefab.name, v2.licensePrefab);
             KeyToPrefab.Add(v2.RenderPrefabName, v2.RenderPrefab);
             KeyToPrefab.Add(v2.SampleRenderPrefabName, v2.SampleRenderPrefab);
         }

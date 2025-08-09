@@ -1,5 +1,7 @@
 ﻿using HarmonyLib;
 
+using DVLicenseManager = global::LicenseManager;
+
 namespace CL.Game.Patches
 {
     [HarmonyPatch(typeof(SaveGameManager))]
@@ -16,7 +18,7 @@ namespace CL.Game.Patches
 
             foreach (var (_, V2) in LicenseManager.AddedGeneralLicenses)
             {
-                if (global::LicenseManager.Instance.IsGeneralLicenseAcquired(V2))
+                if (DVLicenseManager.Instance.IsGeneralLicenseAcquired(V2))
                 {
                     totalRefund += V2.price;
                 }
@@ -24,7 +26,7 @@ namespace CL.Game.Patches
 
             foreach (var (_, V2) in LicenseManager.AddedJobLicenses)
             {
-                if (global::LicenseManager.Instance.IsJobLicenseAcquired(V2))
+                if (DVLicenseManager.Instance.IsJobLicenseAcquired(V2))
                 {
                     totalRefund += V2.price;
                 }
