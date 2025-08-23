@@ -2,6 +2,11 @@
   "Releases": [
     {
       "Id": "DVCustomLicenses",
+      "Version": "1.1.1",
+      "DownloadUrl": "https://github.com/WhistleWiz/dv-custom-licenses/releases/download/v1.1.1/DVCustomLicenses.zip"
+    },
+    {
+      "Id": "DVCustomLicenses",
       "Version": "1.1.0",
       "DownloadUrl": "https://github.com/WhistleWiz/dv-custom-licenses/releases/download/v1.1.0/DVCustomLicenses.zip"
     },
