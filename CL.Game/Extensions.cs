@@ -26,6 +26,8 @@ namespace CL.Game
             newLicense.insuranceFeeQuotaIncrease = license.InsuranceFeeQuotaIncrease;
             newLicense.bonusTimeDecreasePercentage = license.BonusTimeDecreasePercentage;
 
+            ReflectionHelper.AssignAvailability(newLicense);
+
             return newLicense;
         }
 
@@ -44,6 +46,8 @@ namespace CL.Game
             newLicense.price = license.Price;
             newLicense.insuranceFeeQuotaIncrease = license.InsuranceFeeQuotaIncrease;
             newLicense.bonusTimeDecreasePercentage = license.BonusTimeDecreasePercentage;
+
+            ReflectionHelper.AssignAvailability(newLicense);
 
             return newLicense;
         }
