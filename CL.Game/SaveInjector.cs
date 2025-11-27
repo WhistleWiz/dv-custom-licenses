@@ -92,15 +92,15 @@ namespace CL.Game
             if (LoadedData != null && Inventory.Instance)
             {
                 CLMod.Log("Acquiring licenses...");
-                List<string> general = new List<string>();
-                List<string> job = new List<string>();
+                List<string> general = new();
+                List<string> job = new();
                 float totalCost = 0;
 
                 foreach (var (_, V2) in LicenseManager.AddedGeneralLicenses)
                 {
                     var result = LoadedData.GetBool($"{Constants.SaveKeyAcquiredLicense}{V2.id}");
 
-                    if (result != null && result.Value)
+                    if (result != null && result.Value && !global::LicenseManager.Instance.IsGeneralLicenseAcquired(V2))
                     {
                         global::LicenseManager.Instance.AcquireGeneralLicense(V2);
                         general.Add(V2.id);
@@ -114,7 +114,7 @@ namespace CL.Game
                 {
                     var result = LoadedData.GetBool($"{Constants.SaveKeyAcquiredLicense}{V2.id}");
 
-                    if (result != null && result.Value)
+                    if (result != null && result.Value && !global::LicenseManager.Instance.IsJobLicenseAcquired(V2))
                     {
                         global::LicenseManager.Instance.AcquireJobLicense(V2);
                         job.Add(V2.id);
