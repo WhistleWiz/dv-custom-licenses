@@ -293,7 +293,7 @@ namespace CL.Game
                 // Shove the raw bytes of the image into the texture.
                 // Texture size is not important and will be automatically changed.
                 data = File.ReadAllBytes(path);
-                var tex = new Texture2D(2, 2);
+                var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
                 tex.LoadImage(data);
                 tex.wrapMode = TextureWrapMode.Clamp;
                 tex.filterMode = FilterMode.Bilinear;
@@ -374,7 +374,8 @@ namespace CL.Game
         }
 
         // Mod limits job licenses to 21 due to the way they work in DV.
-        public static List<int> GetAvailableJobLicenseIds() => new List<int>
+        // Remove 2 for Passenger Jobs compatibility.
+        public static List<int> GetAvailableJobLicenseIds() => new()
         {
             // Basic: 0
             // Hazmat 1: 1
@@ -384,7 +385,7 @@ namespace CL.Game
             // Military 2: 16
             // Military 3: 32
             // Passenger Jobs (mod compatibility): 64
-            128,
+            // Passenger Jobs (mod compatibility): 128,
             256,
             // Freight Haul: 512
             // Shunting: 1024
