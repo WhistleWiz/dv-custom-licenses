@@ -21,7 +21,6 @@
 	<ItemGroup>
 		<Reference Include="0Harmony" />
 		<Reference Include="Assembly-CSharp" />
-		<Reference Include="DV.Inventory" />
 		<Reference Include="DV.Localization" />
 		<Reference Include="DV.ThingTypes" />
 		<Reference Include="DV.Utils" />

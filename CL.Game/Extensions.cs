@@ -14,6 +14,7 @@ namespace CL.Game
         {
             var newLicense = ScriptableObject.CreateInstance<CustomGeneralLicenseV2>();
 
+            newLicense.name = $"CustomGeneralLicense_{license.Identifier}";
             newLicense.id = license.Identifier;
             newLicense.v1 = (GeneralLicenseType)(++s_tempValue);
             newLicense.Original = license;
@@ -35,6 +36,7 @@ namespace CL.Game
         {
             var newLicense = ScriptableObject.CreateInstance<CustomJobLicenseV2>();
 
+            newLicense.name = $"CustomJobLicense_{license.Identifier}";
             newLicense.id = license.Identifier;
             newLicense.v1 = (JobLicenses)(++s_tempValue);
             newLicense.Original = license;

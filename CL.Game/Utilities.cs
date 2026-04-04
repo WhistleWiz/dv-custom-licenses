@@ -11,7 +11,7 @@ namespace CL.Game
             {
                 if (s_holder == null)
                 {
-                    s_holder = new GameObject("[CL HOLDER]").transform;
+                    s_holder = new GameObject("[Custom License Holder]").transform;
                     s_holder.gameObject.SetActive(false);
 
                     Object.DontDestroyOnLoad(s_holder.gameObject);

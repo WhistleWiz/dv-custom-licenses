@@ -1,5 +1,4 @@
 ﻿using CL.Common;
-using DV.InventorySystem;
 using DV.JObjectExtstensions;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
@@ -89,44 +88,37 @@ namespace CL.Game
 
         internal static void AcquireLicenses()
         {
-            if (LoadedData != null && Inventory.Instance)
+            if (LoadedData == null) return;
+
+            CLMod.Log("Acquiring licenses...");
+            List<string> general = new();
+            List<string> job = new();
+
+            foreach (var (_, V2) in LicenseManager.AddedGeneralLicenses)
             {
-                CLMod.Log("Acquiring licenses...");
-                List<string> general = new();
-                List<string> job = new();
-                float totalCost = 0;
+                var result = LoadedData.GetBool($"{Constants.SaveKeyAcquiredLicense}{V2.id}");
 
-                foreach (var (_, V2) in LicenseManager.AddedGeneralLicenses)
+                if (result != null && result.Value && !global::LicenseManager.Instance.IsGeneralLicenseAcquired(V2))
                 {
-                    var result = LoadedData.GetBool($"{Constants.SaveKeyAcquiredLicense}{V2.id}");
-
-                    if (result != null && result.Value && !global::LicenseManager.Instance.IsGeneralLicenseAcquired(V2))
-                    {
-                        global::LicenseManager.Instance.AcquireGeneralLicense(V2);
-                        general.Add(V2.id);
-                        totalCost += V2.price;
-                    }
+                    global::LicenseManager.Instance.AcquireGeneralLicense(V2);
+                    general.Add(V2.id);
                 }
-
-                CLMod.Log($"GL: {string.Join(", ", general)}");
-
-                foreach (var (_, V2) in LicenseManager.AddedJobLicenses)
-                {
-                    var result = LoadedData.GetBool($"{Constants.SaveKeyAcquiredLicense}{V2.id}");
-
-                    if (result != null && result.Value && !global::LicenseManager.Instance.IsJobLicenseAcquired(V2))
-                    {
-                        global::LicenseManager.Instance.AcquireJobLicense(V2);
-                        job.Add(V2.id);
-                        totalCost += V2.price;
-                    }
-                }
-
-                CLMod.Log($"JL: {string.Join(", ", job)}");
-
-                // Remove total license cost.
-                Inventory.Instance.RemoveMoney(totalCost);
             }
+
+            CLMod.Log($"GL: {string.Join(", ", general)}");
+
+            foreach (var (_, V2) in LicenseManager.AddedJobLicenses)
+            {
+                var result = LoadedData.GetBool($"{Constants.SaveKeyAcquiredLicense}{V2.id}");
+
+                if (result != null && result.Value && !global::LicenseManager.Instance.IsJobLicenseAcquired(V2))
+                {
+                    global::LicenseManager.Instance.AcquireJobLicense(V2);
+                    job.Add(V2.id);
+                }
+            }
+
+            CLMod.Log($"JL: {string.Join(", ", job)}");
         }
 
         private class LicenseMappingDataHolder
